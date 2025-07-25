@@ -19,7 +19,7 @@ export const handleUpdateUser = async (req, res, next) => {
       updateData.name = userData.name;
     }
 
-    const avatar = userData?.avatar;
+    const avatar = updateData.avatar ? JSON.parse(req.body.avatar) : null;
     if (avatar && typeof avatar == "object") {
       updateData.avatar = {
         public_id: avatar.public_id,
