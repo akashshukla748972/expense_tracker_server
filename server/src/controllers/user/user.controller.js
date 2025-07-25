@@ -27,7 +27,8 @@ export const handleUpdateUser = async (req, res, next) => {
       };
     }
 
-    console.log(updateData);
+    console.log(typeof userData?.avatar);
+    console.log(req.body);
 
     const updatedUser = await userModel
       .findByIdAndUpdate(user_id, updateData, { new: true })
