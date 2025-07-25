@@ -53,8 +53,7 @@ export const handleLoginUser = async (req, res, next) => {
     if (!isExistEmail) {
       return next(new CustomError("Invalid email or password", 400));
     }
-    const isMatched = await bcrypt.compare(password, isExistEmail?.password);
-    console.log(req.body);
+    const isMatched = await bcrypt.compare(password, isExistEmail.password);
 
     if (!isMatched) {
       return next(new CustomError("Invalid email or password", 400));

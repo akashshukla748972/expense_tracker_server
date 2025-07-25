@@ -15,24 +15,15 @@ export const handleUpdateUser = async (req, res, next) => {
 
     const updateData = {};
 
-    if (userData) {
+    if (userData.name) {
       updateData.name = userData.name;
     }
 
-    const file = req?.files?.avatar;
-    let response;
-    if (file) {
-      response = await cloudinary.uploader.upload(file.tempFilePath, {
-        folder: "expense_tracker/user",
-      });
-
-      if (!response || response.error) {
-        return next(new CustomError("Cloudinary error.", 500));
-      }
-
+    const avatar = userData.avatar;
+    if (avatar && typeof avatar == "object") {
       updateData.avatar = {
-        public_id: response.public_id,
-        url: response.secure_url,
+        public_id: avatar.public_id,
+        url: avatar.url,
       };
     }
 
