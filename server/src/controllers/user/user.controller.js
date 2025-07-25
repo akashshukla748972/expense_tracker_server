@@ -19,13 +19,15 @@ export const handleUpdateUser = async (req, res, next) => {
       updateData.name = userData.name;
     }
 
-    const avatar = userData.avatar;
+    const avatar = userData?.avatar;
     if (avatar && typeof avatar == "object") {
       updateData.avatar = {
         public_id: avatar.public_id,
         url: avatar.url,
       };
     }
+
+    console.log(updateData);
 
     const updatedUser = await userModel
       .findByIdAndUpdate(user_id, updateData, { new: true })
