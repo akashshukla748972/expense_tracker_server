@@ -27,6 +27,7 @@ export const handleUpdateUser = async (req, res, next) => {
       };
     }
 
+    console.log(req.body);
     console.log(typeof userData?.avatar);
     console.log(req.body);
 
