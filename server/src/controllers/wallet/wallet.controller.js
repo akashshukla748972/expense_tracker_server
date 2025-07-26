@@ -155,7 +155,7 @@ export const handleGetAllWallet = async (req, res, next) => {
       return next(new CustomError("Invalid user id.", 400));
     }
 
-    const wallet = await walletModel.find({ user: id });
+    const wallet = await walletModel.find({ user: id }).sort({ createdAt: -1 });
     if (wallet.length == 0) {
       return next(new CustomError("Data not found.", 404));
     }
