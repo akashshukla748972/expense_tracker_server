@@ -5,6 +5,7 @@ import fileUpload from "express-fileupload";
 
 import authRouter from "./src/routes/auth.routes.js";
 import userRouter from "./src/routes/user.routes.js";
+import walletRouter from "./src/routes/wallet.routes.js";
 
 import errorHandler from "./src/middlewares/error.middleware.js";
 import CustomError from "./src/utils/CustomError.js";
@@ -27,6 +28,7 @@ app.use(
 
 app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
+app.use("/api/wallet", walletRouter);
 app.use((req, res, next) => {
   return next(new CustomError("Page not found.", 404));
 });

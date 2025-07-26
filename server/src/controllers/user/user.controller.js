@@ -5,10 +5,10 @@ import { v2 as cloudinary } from "cloudinary";
 
 export const handleUpdateUser = async (req, res, next) => {
   try {
-    const { user_id } = req.params;
+    const { id } = req.user;
     const userData = req.body;
 
-    const isValidId = isValidObjectId(user_id);
+    const isValidId = isValidObjectId(id);
     if (!isValidId) {
       return next(new CustomError("Invalid user id.", 400));
     }
@@ -27,12 +27,8 @@ export const handleUpdateUser = async (req, res, next) => {
       };
     }
 
-    console.log(req.body);
-    console.log(typeof userData?.avatar);
-    console.log(req.body);
-
     const updatedUser = await userModel
-      .findByIdAndUpdate(user_id, updateData, { new: true })
+      .findByIdAndUpdate(id, updateData, { new: true })
       .select("-password");
     if (!updatedUser) {
       return next(new CustomError("User not found.", 404));
