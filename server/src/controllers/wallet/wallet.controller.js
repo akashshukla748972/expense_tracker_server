@@ -75,7 +75,7 @@ export const handleUpdateWallet = async (req, res, next) => {
       return next(new CustomError("bollet not found.", 404));
     }
 
-    return res.status(201).json({
+    return res.status(200).json({
       message: "Wallet updated successfully.",
       isSuccess: true,
     });
@@ -107,7 +107,7 @@ export const handleDeleteWallet = async (req, res, next) => {
       return next(new CustomError("Wallet not found for delete.", 404));
     }
 
-    return res.status(201).json({
+    return res.status(200).json({
       message: "Wallet deleted successfully.",
       isSuccess: true,
     });
@@ -136,7 +136,7 @@ export const handleGetWallet = async (req, res, next) => {
       return next(new CustomError("Wallet not found.", 404));
     }
 
-    return res.status(201).json({
+    return res.status(200).json({
       message: "Wallet get successfully.",
       data: wallet,
       isSuccess: true,
@@ -160,7 +160,7 @@ export const handleGetAllWallet = async (req, res, next) => {
       return next(new CustomError("Data not found.", 404));
     }
 
-    return res.status(201).json({
+    return res.status(200).json({
       message: "All wallet get successfully.",
       data: wallet,
       isSuccess: true,
