@@ -7,16 +7,16 @@ const walletSchema = new Schema(
       required: true,
     },
     amount: {
-      type: String,
-      default: "0",
+      type: Number,
+      default: 0,
     },
     total_income: {
-      type: String,
-      default: "0",
+      type: Number,
+      default: 0,
     },
     total_expenses: {
-      type: String,
-      default: "0",
+      type: Number,
+      default: 0,
     },
     avatar: {
       public_id: {
