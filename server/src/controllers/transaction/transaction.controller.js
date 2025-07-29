@@ -6,27 +6,32 @@ import isValidObjectId from "../../utils/validateObjectId.js";
 
 export const handleCreateTransaction = async (req, res, next) => {
   const session = await mongoose.startSession();
-  session.startTransaction();
   try {
-    const { type, category, walletId, date, description, avatar } = req.body;
+    await session.startTransaction();
 
+    const { type, category, walletId, date, description, avatar } = req.body;
     const { id } = req.user;
-    const isValidId = isValidObjectId(id);
-    if (!isValidId) {
+
+    if (!isValidObjectId(id)) {
+      await session.abortTransaction();
       return next(new CustomError("Invalid user id.", 400));
     }
 
-    const isValidWalletId = isValidObjectId(walletId);
-    if (!isValidWalletId) {
+    if (!isValidObjectId(walletId)) {
+      await session.abortTransaction();
       return next(new CustomError("Invalid wallet id.", 400));
+    }
+
+    if (type === "expense" && !category) {
+      await session.abortTransaction();
+      return next(new CustomError("Expense category is required.", 400));
     }
 
     const wallet = await walletModel
       .findOne({ _id: walletId, user: id })
       .session(session);
-
     if (!wallet) {
-      session.abortTransaction();
+      await session.abortTransaction();
       return next(new CustomError("Wallet not found.", 400));
     }
 
@@ -34,30 +39,30 @@ export const handleCreateTransaction = async (req, res, next) => {
     amount = parseInt(amount);
 
     if (type === "expense" && wallet.amount < amount) {
-      session.abortTransaction();
+      await session.abortTransaction();
       return next(new CustomError("Insufficient balance", 400));
     }
 
     if (type === "income") {
       wallet.amount += amount;
       wallet.total_income += amount;
-    }
-    if (type == "expense") {
+    } else if (type === "expense") {
       wallet.amount -= amount;
       wallet.total_expenses += amount;
     }
+
     await wallet.save({ session });
 
     const createTransaction = {
       user: id,
+      type,
+      amount,
+      category,
+      walletId,
+      date: date ? new Date(date).toISOString() : undefined,
+      description,
     };
-    if (type) createTransaction.type = type;
-    if (amount) createTransaction.amount = amount;
-    if (category) createTransaction.category = category;
-    if (walletId) createTransaction.walletId = walletId;
-    if (date) createTransaction.date = new Date(date).toISOString();
-    if (description) createTransaction.description = description;
-    if (type) createTransaction.type = type;
+
     if (avatar && typeof avatar === "object") {
       createTransaction.avatar = {
         public_id: avatar.public_id,
@@ -65,23 +70,22 @@ export const handleCreateTransaction = async (req, res, next) => {
       };
     }
 
-    console.log(createTransaction);
-
-    // create transaction
     const newTransaction = new TransactionModel(createTransaction);
     await newTransaction.save({ session });
 
-    session.commitTransaction();
+    await session.commitTransaction();
 
     return res.status(201).json({
       message: "Transaction added successfully.",
       data: newTransaction,
     });
   } catch (error) {
-    session.abortTransaction();
-    console.error(`Error while create new transaction: ${error.message}`);
+    if (session.inTransaction()) {
+      await session.abortTransaction();
+    }
+    console.error(`❌ Error while creating transaction: ${error.message}`);
     return next(new CustomError("Internal server error.", 500));
   } finally {
-    session.endSession();
+    await session.endSession();
   }
 };

@@ -15,7 +15,7 @@ const TransactionSchema = new Schema(
     },
     category: {
       type: String,
-      required: true,
+      default: null,
     },
     walletId: {
       type: Schema.Types.ObjectId,
