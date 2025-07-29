@@ -89,3 +89,29 @@ export const handleCreateTransaction = async (req, res, next) => {
     await session.endSession();
   }
 };
+
+export const handleGetAllTransaction = async (req, res, next) => {
+  try {
+    const { id } = req.user;
+    const isValidId = isValidObjectId(id);
+    if (!isValidId) {
+      return next(new CustomError("Invalid user id.", 400));
+    }
+
+    const transaction = await TransactionModel.find({ user: id }).sort({
+      createdAt: -1,
+    });
+    if (transaction.length == 0) {
+      return next(new CustomError("Data not found.", 404));
+    }
+
+    return res.status(200).json({
+      message: "All transaction get successfully.",
+      data: transaction,
+      isSuccess: true,
+    });
+  } catch (error) {
+    console.error(`Error while getting all transaction: ${error}`);
+    return next(new CustomError("Internal server error.", 500));
+  }
+};
